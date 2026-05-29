@@ -19,8 +19,19 @@ Route::get('/logout', [UserController::class, 'logout'])->middleware('auth:sanct
 Route::get('/admin/users', [UserController::class, 'listUsers'])->middleware('auth:sanctum');
 
 // rotas de imoveis
-Route::resource('/properties', PropertyController::class)->only('index', 'show');
-Route::resource('/properties', PropertyController::class)->only('update', 'store', 'destroy')->middleware('auth:sanctum');
+
+// crud
+Route::post('property/store', [PropertyController::class, 'store'])->middleware('auth:sanctum');
+Route::put('property/update{property}', [PropertyController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('property/delete/{property}', [PropertyController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+// show
+
+Route::get('/properties', [PropertyController::class, 'index']);
+Route::get('/property/{property}', [PropertyController::class, 'show']);
+
+// iterations
 Route::get('/property/like', [PropertyLikeController::class, 'toggleLike'])->middleware('auth:sanctum');
 Route::get('/property/rent', [PropertyController::class, 'toggleRentProperty'])->middleware('auth:sanctum');
 Route::get('/property/toggleEnabled', [PropertyController::class, 'toggleEnableProperty'])->middleware('auth:sanctum');
