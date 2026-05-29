@@ -35,7 +35,7 @@ class PropertyController extends Controller
             'washer' => 'boolean',
             'microwave' => 'boolean',
             'contract' => 'required|string',
-            'images' => 'required',
+            'images' => '',
             'pricePerDay' => 'required|integer',
             'status' => 'required|string',
             'property_reviews_id' => 'required|integer',
@@ -51,20 +51,23 @@ class PropertyController extends Controller
             'washer', 'microwave', 'contract'
         ]));
 
-        if (count($request->images) > 0) {
-            $titleDirectory = $request->property_title;
-            $directory = "assets/images/properties/$titleDirectory";
-            Storage::disk('public')->makeDirectory($directory);
+        if (isset($request->images)) {
+            if (count($request->images) > 0) {
+                $titleDirectory = $request->property_title;
+                $directory = "assets/images/properties/$titleDirectory";
+                Storage::disk('public')->makeDirectory($directory);
 
-            foreach ($request->images as $image) {
-                $property_image_path = $image->storeAs($directory, $image->getClientOriginalName(), 'public');
-                $newImage = PropertyImage::create([
-                    'property_id' => $property->id,
-                    'path' => $property_image_path,
-                ]);
-                if (!isset($property->property_image_id)) {
-                    $property->update(['property_image_id' => $newImage->id]);
+                foreach ($request->images as $image) {
+                    $property_image_path = $image->storeAs($directory, $image->getClientOriginalName(), 'public');
+                    $newImage = PropertyImage::create([
+                        'property_id' => $property->id,
+                        'path' => $property_image_path,
+                    ]);
+                    if (!isset($property->property_image_id)) {
+                        $property->update(['property_image_id' => $newImage->id]);
+                    }
                 }
+
             }
         }
 

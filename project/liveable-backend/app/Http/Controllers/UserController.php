@@ -24,16 +24,20 @@ class UserController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|string',
-            'phone' => 'required|string',
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'phone' => 'string',
+            'profile_picture' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-        $image = $request->file('profile_picture');
-        $name = $request->name . '_' . $image->getClientOriginalName() . '.png';
-        $profile_picture = $image->storeAs('assets/images/users', $name, 'public');
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'phone'), ['password' => Hash::make($request->password), 'profile_picture' => $profile_picture]);
+        if ($request->hasFile('profile_picture')) {
+            $image = $request->file('profile_picture');
+            $name = $request->name . '_' . $image->getClientOriginalName() . '.png';
+            $profile_picture = $image->storeAs('assets/images/users', $name, 'public');
+        }
+
+
+        $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'phone'), ['password' => Hash::make($request->password)]);
         if (User::create($data)) {
             return response()->json(['message' => 'Usuario registrado'], 201);
         }
@@ -78,16 +82,18 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string',
             'phone' => 'required|string',
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'profile_picture' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-        $image = $request->file('profile_picture');
-        if (Storage::disk('public')->exists($user->profile_picture)) {
-            Storage::disk('public')->delete($user->profile_picture);
-        }
-        $name = $request->name . '_' . $image->getClientOriginalName() . '.png';
-        $profile_picture = $image->storeAs('assets/images/users', $name, 'public');
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
+        }
+        if ($request->hasFile('profile_picture')) {
+            $image = $request->file('profile_picture');
+            if (Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $name = $request->name . '_' . $image->getClientOriginalName() . '.png';
+            $profile_picture = $image->storeAs('assets/images/users', $name, 'public');
         }
         $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'telephone'), ['password' => Hash::make($request->password), 'profile_picture' => $profile_picture]);
 
