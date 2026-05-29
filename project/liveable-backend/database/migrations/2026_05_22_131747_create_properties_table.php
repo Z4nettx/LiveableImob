@@ -24,6 +24,9 @@ return new class extends Migration {
             $table->boolean('microwave');
             $table->string('contract');
             $table->string('property_image_id')->nullable();
+            $table->string('status');
+            $table->foreignId('property_like_id')->constrained('property_likes');
+            $table->foreignId('property_image_id')->constrained('property_images');
             $table->timestamps();
         });
     }

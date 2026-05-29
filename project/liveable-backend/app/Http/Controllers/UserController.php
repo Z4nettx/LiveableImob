@@ -24,7 +24,7 @@ class UserController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|string',
-            'telephone' => 'required|string',
+            'phone' => 'required|string',
             'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         $image = $request->file('profile_picture');
@@ -33,7 +33,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'telephone'), ['password' => Hash::make($request->password), 'profile_picture' => $profile_picture]);
+        $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'phone'), ['password' => Hash::make($request->password), 'profile_picture' => $profile_picture]);
         if (User::create($data)) {
             return response()->json(['message' => 'Usuario registrado'], 201);
         }
@@ -58,9 +58,9 @@ class UserController extends Controller
         return response()->json(['message' => 'Dados Incorretos'], 401);
     }
 
-    public function show(User $users)
+    public function show(User $user)
     {
-        $user = User::findOrFail($users->id);
+        $user = User::findOrFail($user->id);
         return response()->json($user);
     }
 
@@ -70,19 +70,19 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function update(Request $request, User $users)
+    public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|string',
-            'telephone' => 'required|string',
+            'phone' => 'required|string',
             'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         $image = $request->file('profile_picture');
-        if (Storage::disk('public')->exists($users->profile_picture)) {
-            Storage::disk('public')->delete($users->profile_picture);
+        if (Storage::disk('public')->exists($user->profile_picture)) {
+            Storage::disk('public')->delete($user->profile_picture);
         }
         $name = $request->name . '_' . $image->getClientOriginalName() . '.png';
         $profile_picture = $image->storeAs('assets/images/users', $name, 'public');
@@ -91,7 +91,7 @@ class UserController extends Controller
         }
         $data = array_merge($request->only('name', 'last_name', 'email', 'is_admin', 'telephone'), ['password' => Hash::make($request->password), 'profile_picture' => $profile_picture]);
 
-        if ($users->update($data)) {
+        if ($user->update($data)) {
             return response()->json(['message' => 'Usuário atualizado'], 200);
         }
         return response()->json(['message' => 'Não foi possivel atualizar o usuário'], 401);

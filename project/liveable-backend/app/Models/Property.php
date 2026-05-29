@@ -57,4 +57,12 @@ class Property extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function isRent(Property $property): bool
+    {
+        return (bool) $property->status == 'rent';
+    }
+    public function isEnabled(Property $property): bool
+    {
+        return (bool) $property->status == 'enabled';
+    }
 }
