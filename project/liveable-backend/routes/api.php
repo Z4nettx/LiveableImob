@@ -4,6 +4,7 @@ use App\Http\Controllers\PropertyLikeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyRentController;
 use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
@@ -33,5 +34,6 @@ Route::get('/property/{property}', [PropertyController::class, 'show']);
 
 // iterations
 Route::get('/property/like', [PropertyLikeController::class, 'toggleLike'])->middleware('auth:sanctum');
-Route::get('/property/rent', [PropertyController::class, 'toggleRentProperty'])->middleware('auth:sanctum');
+Route::post('/property/rent', [PropertyRentController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/property/toggleEnabled', [PropertyController::class, 'toggleEnableProperty'])->middleware('auth:sanctum');
+Route::get('/{user}/myProperties', [UserController::class, 'myProperties'])->middleware('auth:sanctum');

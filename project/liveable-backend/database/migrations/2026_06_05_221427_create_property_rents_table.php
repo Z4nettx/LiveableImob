@@ -2,27 +2,26 @@
 
 use App\Models\Property;
 use App\Models\User;
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void
+return new class {
+    public function up()
     {
         Schema::create('property_rents', function (Blueprint $table) {
             $table->id();
-            $table->integer('people_count');
             $table->date('checkin');
             $table->date('checkout');
-            $table->foreignIdFor(Property::class);
+            $table->boolean('has_pet');
+            $table->integer('people_qtd');
             $table->foreignIdFor(User::class);
-            $table->text('details')->nullable();
-            $table->boolean('has_pet')->default(false);
+            $table->foreignIdFor(Property::class);
+            $table->string('details');
             $table->timestamps();
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('property_rents');
     }

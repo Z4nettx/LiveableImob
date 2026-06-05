@@ -3,21 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use App\Models\PropertyImage;
-use Illuminate\Routing\Attributes\Controllers\Authorize;
 use App\Models\User;
-use App\Models\PropertyRent;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PropertyController extends Controller
 {
     public function index()
-    {
-        $properties = Property::all();
-        return response()->json($properties, 200);
-    }
+{
+    $properties = Property::with('images')->get();
+
+    $properties->transform(function ($property) {
+
+        $property->images->transform(function ($image) {
+
+            $image->url = asset('storage/' . $image->path);
+
+            return $image;
+        });
+
+        return $property;
+    });
+
+    return response()->json($properties, 200);
+}
 
     #[Authorize('adminOrOwner')]
     public function store(Request $request, User $user)
@@ -35,40 +48,49 @@ class PropertyController extends Controller
             'air_conditioning' => 'boolean',
             'washer' => 'boolean',
             'microwave' => 'boolean',
-            'contract' => 'required|string',
+            'contract' => 'string',
             'images' => '',
             'pricePerDay' => 'required|integer',
+            'pricePerWeek' => 'integer',
+            'pricePerMonth' => 'integer',
             'status' => 'required|string',
-            'property_reviews_id' => 'required|integer',
-
+            'property_reviews_id' => 'integer',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        $property = $user->Property::create($request->only([
-            'local', 'type', 'beds_qtd', 'toilette', 'area', 'owner_contact',
-            'property_title', 'wifi', 'tv', 'cooler', 'air_conditioning',
-            'washer', 'microwave', 'contract'
+        $property = Auth::user()->property()->create($request->only([
+            'local',
+            'type',
+            'beds_qtd',
+            'toilette',
+            'area',
+            'property_title',
+            'wifi',
+            'tv',
+            'cooler',
+            'air_conditioning',
+            'washer',
+            'microwave',
+            'pricePerDay',
+            'status',
         ]));
 
-        if (isset($request->images)) {
-            if (count($request->images) > 0) {
-                $titleDirectory = $request->property_title;
-                $directory = "assets/images/properties/$titleDirectory";
-                Storage::disk('public')->makeDirectory($directory);
+        if ($request->hasFile('images')) {
+            $titleDirectory = $request->property_title;
+            $directory = "assets/images/properties/$titleDirectory";
+            Storage::disk('public')->makeDirectory($directory);
 
-                foreach ($request->images as $image) {
-                    $property_image_path = $image->storeAs($directory, $image->getClientOriginalName(), 'public');
-                    $newImage = PropertyImage::create([
-                        'property_id' => $property->id,
-                        'path' => $property_image_path,
-                    ]);
-                    if (!isset($property->property_image_id)) {
-                        $property->update(['property_image_id' => $newImage->id]);
-                    }
+            foreach ($request->images as $image) {
+                $property_image_path = $image->storeAs($directory, $image->getClientOriginalName(), 'public');
+                $newImage = PropertyImage::create([
+                    'property_id' => $property->id,
+                    'path' => $property_image_path,
+                ]);
+                if (!isset($property->property_image_id)) {
+                    $property->update(['property_image_id' => $newImage->id]);
                 }
-
             }
         }
 
@@ -118,7 +140,7 @@ class PropertyController extends Controller
         return response()->json(['message' => 'Propriedade deletada com sucesso!'], 201);
     }
 
-    /*public function toggleRentProperty(Property $property)
+    public function toggleRentProperty(Property $property)
     {
         if ($property->isRent($property)) { // returns true
             return response()->json(['message' => 'Propriedade já alugada'], 400);
@@ -126,7 +148,7 @@ class PropertyController extends Controller
         if ($property->update(['status' => 'rent'])) {
             return response()->json(['message' => 'Propriedade alugada com sucesso!'], 201);
         }
-    }*/
+    }
 
     public function toggleEnableProperty(Property $property)
     {

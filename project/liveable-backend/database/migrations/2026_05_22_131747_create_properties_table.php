@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->integer('beds_qtd');
             $table->integer('toilette');
             $table->integer('area');
-            $table->string('owner_contact');
+            $table->foreignId('user_id');
             $table->string('property_title');
             $table->boolean('wifi');
             $table->boolean('tv');
@@ -22,9 +22,11 @@ return new class extends Migration {
             $table->boolean('air_conditioning');
             $table->boolean('washer');
             $table->boolean('microwave');
-            $table->string('contract');
+            $table->string('contract')->nullable();
             $table->string('status');
             $table->integer('pricePerDay');
+            $table->integer('pricePerWeek')->nullable();
+            $table->integer('pricePerMonth')->nullable();
             $table->foreignId('property_like_id')->nullable();
             $table->foreignId('property_image_id')->nullable();
             $table->timestamps();

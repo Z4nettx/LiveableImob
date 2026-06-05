@@ -2,30 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-class PropertyRent extends Model
+class PropertyRent
 {
     protected $fillable = [
-        'people_count',
+        'property_id',
+        'user_id',
+        'details',
         'checkin',
         'checkout',
-        'property_id',
         'has_pet',
-        'details',
     ];
 
-    public function property(): BelongsTo
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function property()
     {
         return $this->belongsTo(Property::class);
     }
 
-    protected function casts(): array
+    protected function casts()
     {
         return [
             'checkin' => 'date',
             'checkout' => 'date',
+            'has_pet' => 'boolean',
         ];
     }
 }

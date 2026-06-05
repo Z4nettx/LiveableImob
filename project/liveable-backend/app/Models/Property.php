@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PropertyLike;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -26,6 +25,8 @@ class Property extends Model
         'air_conditioning',
         'washer',
         'microwave',
+        'pricePerDay',
+        'status',
         'contract',
         'property_image_id',
     ];
@@ -65,9 +66,8 @@ class Property extends Model
     {
         return (bool) $property->status == 'enabled';
     }
-
-    public function rents(): HasMany
-    {
-        return $this->hasMany(PropertyRent::class);
+    public function images() {
+        return $this->hasMany(PropertyImage::class);
     }
+
 }

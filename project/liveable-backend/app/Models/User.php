@@ -16,7 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'profile_picture',
-        'is_admin',
+        'role',
     ];
 
     protected function casts()
@@ -24,5 +24,9 @@ class User extends Authenticatable
         return [
             'is_admin' => 'boolean',
         ];
+    }
+    public function property()
+    {
+        return $this->hasMany(Property::class);
     }
 }
