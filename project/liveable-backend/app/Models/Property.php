@@ -65,4 +65,9 @@ class Property extends Model
     {
         return (bool) $property->status == 'enabled';
     }
+
+    public function rents(): HasMany
+    {
+        return $this->hasMany(PropertyRent::class);
+    }
 }

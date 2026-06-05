@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\PropertyImage;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 use App\Models\User;
+use App\Models\PropertyRent;
 
 class PropertyController extends Controller
 {
@@ -117,7 +118,7 @@ class PropertyController extends Controller
         return response()->json(['message' => 'Propriedade deletada com sucesso!'], 201);
     }
 
-    public function toggleRentProperty(Property $property)
+    /*public function toggleRentProperty(Property $property)
     {
         if ($property->isRent($property)) { // returns true
             return response()->json(['message' => 'Propriedade já alugada'], 400);
@@ -125,7 +126,7 @@ class PropertyController extends Controller
         if ($property->update(['status' => 'rent'])) {
             return response()->json(['message' => 'Propriedade alugada com sucesso!'], 201);
         }
-    }
+    }*/
 
     public function toggleEnableProperty(Property $property)
     {
